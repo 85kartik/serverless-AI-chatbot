@@ -15,8 +15,11 @@ A beginner-friendly MERN-style chatbot built with React and Vite, Express, Node.
 │       ├── App.jsx
 │       ├── main.jsx
 │       └── index.css
+├── api/                            # Vercel discovers functions here
+│   ├── chat.js                     # /api/chat serverless entry point
+│   └── health.js                   # /api/health serverless entry point
 ├── server/                         # Express backend
-│   ├── api/index.js                 # Vercel serverless entry point
+│   ├── api/index.js                 # Shared Express function adapter
 │   ├── config/openai.js
 │   ├── controllers/chatController.js
 │   ├── middleware/errorMiddleware.js
@@ -45,7 +48,7 @@ The frontend sends `POST /api/chat` with JSON shaped like:
 }
 ```
 
-The controller rejects empty or oversized messages and filters history to recent user and assistant text with a total history budget. The service adds the shared system prompt and calls OpenAI. The API key is read only by Node from `OPENAI_API_KEY`; it is never put in the React bundle. The API returns `{ "reply": "..." }` or `{ "error": "..." }` with an appropriate HTTP status.
+The controller rejects empty or oversized messages and filters history to recent user and assistant text with a total history budget. The service adds the shared system prompt and calls OpenAI. The API key is read only by Node from `OPENAI_API_KEY`; it is never put in the React bundle. The API returns `{ "reply": "..." }` or `{ "error": "..." }` with an appropriate HTTP status. Vercel discovers the chat and health handlers from the repository-root `api/` directory and both forward to the shared Express app.
 
 ### Security basics
 
@@ -111,7 +114,7 @@ Replace the example username and repository name with your own. Before pushing, 
 1. Sign in to [Vercel](https://vercel.com/) and choose **Add New → Project**.
 2. Import the GitHub repository. Keep the project root as the repository root; `vercel.json` already selects `client/dist` as the frontend output and routes `/api/*` to the Express function.
 3. In the Vercel project's **Settings → Environment Variables**, add `OPENAI_API_KEY` with your secret key. Optionally add `OPENAI_MODEL` (defaults to `gpt-4o-mini` for OpenAI and `openai/gpt-oss-120b` for Groq), `OPENAI_BASE_URL` (Groq is detected automatically from a `gsk_` key), and `ALLOWED_ORIGINS` (comma-separated extra trusted browser origins). Add them to the environments you intend to use (Production, and Preview if needed).
-4. Click **Deploy**. Vercel runs the root build command, `npm run build`, which builds the Vite client. The API handler lives at `server/api/index.js`; `/api/chat` reaches the Express chat route.
+4. Click **Deploy**. Vercel runs the root build command, `npm run build`, which builds the Vite client. The API handlers live under the root `api/` directory; `/api/chat` and `/api/health` reach the shared Express app.
 5. Once deployment finishes, open the public `*.vercel.app` URL. Test the UI with a message, and optionally visit `/api/health` to confirm the API is up.
 6. Future pushes to the connected GitHub branch trigger a new deployment. If you change environment variables, redeploy so the function receives them.
 
@@ -120,3 +123,4 @@ Replace the example username and repository name with your own. Before pushing, 
 - The API does not expose the OpenAI key to browser code. The API endpoint is public, however, so a real public launch should add user authentication, request throttling, and cost controls.
 - Chat history is saved in the current browser only, not a database or across devices. The workspace settings include an option to clear browser-saved conversations.
 - Vercel's free plan and OpenAI API usage have separate limits. Check each account's current plan and usage before sharing the app widely.
+
