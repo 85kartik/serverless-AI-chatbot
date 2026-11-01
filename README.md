@@ -123,3 +123,4 @@ Replace the example username and repository name with your own. Before pushing, 
 - The API does not expose the OpenAI key to browser code. The API endpoint is public, however, so a real public launch should add user authentication, request throttling, and cost controls.
 - Chat history is saved in the current browser only, not a database or across devices. The workspace settings include an option to clear browser-saved conversations.
 - Vercel's free plan and OpenAI API usage have separate limits. Check each account's current plan and usage before sharing the app widely.
+
