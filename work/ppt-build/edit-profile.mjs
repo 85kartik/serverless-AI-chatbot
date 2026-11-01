@@ -1,0 +1,18 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { PresentationFile, FileBlob } from 'file:///C:/Users/karti/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@oai/artifact-tool/dist/artifact_tool.mjs';
+const base='C:/Users/karti/Documents/Codex/2026-10-31/project-serverless-ai-chatbot-with-llm';
+const input=path.join(base,'outputs/serverless-ai-chatbot-project-walkthrough.pptx');
+const draft=path.join(base,'work/ppt-build/serverless-ai-chatbot-updated-draft.pptx');
+const p=await PresentationFile.importPptx(await FileBlob.load(input));
+const url='https://www.linkedin.com/in/karteek-parab-293508371/';
+const slide=p.slides.items[9];
+const link=p.resolve('sh/p0ru503u');
+link.text.set([{runs:[{run:'linkedin.com/in/karteek-parab-293508371',style:{bold:true,fontSize:'22px',typeface:'Arial',color:'#FFFFFF',underline:'sng'},link:{uri:url,isExternal:true}}]}]);
+p.resolve('sh/ozitcv29').text='LINKEDIN PROFILE';
+p.resolve('sh/zelojyl8').text='Source, live app, health check, and LinkedIn profile';
+slide.speakerNotes.text='Links: repository https://github.com/85kartik/serverless-AI-chatbot. Live application root is inferred from the supplied health URL https://serverless-ai-chatbot-coral.vercel.app/api/health. Health endpoint: https://serverless-ai-chatbot-coral.vercel.app/api/health. LinkedIn profile: '+url;
+const png=await p.export({slide,format:'png',scale:1}); await fs.writeFile(path.join(base,'work/ppt-build/slide-10-updated.png'),new Uint8Array(await png.arrayBuffer()));
+await (await PresentationFile.exportPptx(p)).save(draft);
+const check=await p.inspect({kind:'slide,textbox,shape,notes',search:'karteek-parab',maxChars:3000});
+console.log(check.ndjson);console.log('draft',draft);
